@@ -1,0 +1,7 @@
+{
+    "source": "ros-industrial",
+    "link": [
+        "github.com/ros-industrial",
+        {"kuka": "https://github.com/ros-industrial/kuka_experimental/tree/e906e76700cec944c3f04728157f487b771cf399"}
+]
+}
