@@ -36,6 +36,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <limits>
 
+
 namespace TRAC_IK {
 
 TRAC_IK::TRAC_IK(const KDL::Chain &_chain, const KDL::JntArray &_q_min, const KDL::JntArray &_q_max, double _maxtime, double _eps, SolveType _type)

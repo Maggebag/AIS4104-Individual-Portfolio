@@ -31,6 +31,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TRAC_IK_HPP
 #define TRAC_IK_HPP
 
+#include <chrono>
 #include <trac_ik/nlopt_ik.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
 #include <thread>
