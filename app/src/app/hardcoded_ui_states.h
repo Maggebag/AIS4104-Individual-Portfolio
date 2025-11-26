@@ -47,10 +47,10 @@ inline Visualization::ToolConfigurationWindow::State default_tool_state()
         //Position of the tool 3D model used in rendering
         Eigen::Vector3f{0.f, 0.f, 0.f},
         //Euler ZYX orientation (IN DEGREES) of the tool 3D model used in rendering
-        Eigen::Vector3f{0.f, 0.f, 0.f},
+        Eigen::Vector3f{0.f, -90.f, 0.f},
         //Tool center point offset used for robot kinematics.
-        // Eigen::Vector3f{0.0425f, 0.025f, 0.1525f},
-        Eigen::Vector3f{0.f, 0.f, 0.f},
+        Eigen::Vector3f{0.0425f, 0.025f, 0.1525f},
+        // Eigen::Vector3f{0.f, 0.f, 0.f},
         //Euler ZYX orientation (IN DEGREES) of the tool center point used for robot kinematics.
         Eigen::Vector3f{0.f, 0.f, 0.f}
     };
@@ -70,7 +70,7 @@ inline Visualization::WorldObjectConfigurationWindow::State default_world_object
         //Position of the world object 3D model used in rendering
         Eigen::Vector3f{1.015f, 0.f, -0.18f},
         //Euler ZYX orientation (IN DEGREES) of the world object 3D model used in rendering
-        Eigen::Vector3f{0.f, 0.f, 0.f}
+        Eigen::Vector3f{0.f, 90.f, -90.f}
     };
 }
 }

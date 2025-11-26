@@ -2,6 +2,7 @@
 #define AIS4104_UTILITY_MATH_H
 
 #include <Eigen/Dense>
+#include <numbers>
 
 namespace AIS4104::utility {
 
