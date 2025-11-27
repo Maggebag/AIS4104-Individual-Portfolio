@@ -33,7 +33,7 @@ uint8_t RobotWrapper::joint_count() const
     return m_solver->joint_count();
 }
 
-//TASK: Implement the function to calculate the joint positions for the desired tool pose
+//Completed-TASK: Implement the function to calculate the joint positions for the desired tool pose
 // a) Use m_tool_transform to calculate the flange pose required by m_solver.ik_solve()
 // b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
 Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, const Eigen::VectorXd &j0) const
@@ -43,7 +43,7 @@ Eigen::VectorXd RobotWrapper::ik_solve_pose(const Eigen::Matrix4d &eef_pose, con
     return ik_solve_flange_pose(desired_flange_pose, j0);
 }
 
-//TASK: Implement the function to calculate the joint positions for the desired flange pose
+//Completed-TASK: Implement the function to calculate the joint positions for the desired flange pose
 // a) Use m_tool_transform to calculate the flange pose required by m_solver.ik_solve()
 // b) Use the m_solver.ik_solve() overload with the solution selector lambda to choose the most desirable IK solution.
 Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange_pose, const Eigen::VectorXd &j0) const
@@ -63,7 +63,6 @@ Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange
         for (uint32_t i = 0; i < candidates.size(); i++) {
             const auto &q = candidates[i];
             double cost = 0.0;
-            std::cout << "We are checking, we get back to you" << std::endl;
 
             for (int j = 0; j < q.size(); j++) {
                 cost += weight_distance * std::abs(q(j) - j0(j));
@@ -82,7 +81,7 @@ Eigen::VectorXd RobotWrapper::ik_solve_flange_pose(const Eigen::Matrix4d &flange
         }
         return best_idx;
     };
-    std::cout << "Ferrari Pitlane Moment" << std::endl;
+
     return m_solver->ik_solve(flange_pose, j0, selector);
 }
 

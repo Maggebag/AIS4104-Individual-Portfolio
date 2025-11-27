@@ -127,11 +127,10 @@ namespace AIS4104::utility {
         const double v_norm = v.norm();
 
         if (w_norm < 1e-6) {
-            Eigen::Vector3d Screw = Twist / v_norm;
+            Eigen::VectorXd Screw = Twist / v_norm;
             return Screw;
         }
-
-        Eigen::Vector3d Screw = Twist / w_norm;
+        Eigen::VectorXd Screw = Twist / w_norm;
         return Screw;
     }
 
@@ -191,26 +190,28 @@ namespace AIS4104::utility {
 
         if (r.isApprox(Eigen::Matrix3d::Identity())) {
             theta = 0;
+            w.setZero();
+            return {w,theta};
         }
         else {
             double trace_r = r.trace(); // Built-in eigen function for trace
             if (float_equals(trace_r, -1)) {
                 theta = std::numbers::pi;
                 w = (1 / sqrt(2 * (1 + r(2,2)))) * Eigen::Vector3d (r(0,2), r(1,2), 1 + r(2,2));
+                return {w,theta};
             }
             else {
-                theta = std::acos(0.5 * (trace_r - 1));
-                double w_n = 1.0 / 2.0 * std::sin(theta);
-
-                double w_1 = w_n * (r(2, 1) - r(1, 2));
-                double w_2 = w_n * (r(0, 2) - r(2, 0));
-                double w_3 = w_n * (r(1, 0) - r(0, 1));
-
+                double cos_theta = 0.5 * (trace_r - 1.0);
+                cos_theta = std::min(1.0, std::max(-1.0, cos_theta)); // clamp, trying to avoid any Nan values
+                theta = std::acos(cos_theta);
+                double w_n = (2.0 * std::sin(theta));
+                double w_1 = (r(2, 1) - r(1, 2)) / w_n;
+                double w_2 = (r(0, 2) - r(2, 0)) / w_n;
+                double w_3 = (r(1, 0) - r(0, 1)) / w_n;
                 w = Eigen::Vector3d(w_1, w_2, w_3);
+                return {w,theta};
             }
         }
-
-        return {w, theta};
     }
 
     // Algorithm on page 104, MR pre-print 2019

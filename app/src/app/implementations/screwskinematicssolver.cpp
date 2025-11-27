@@ -1,5 +1,6 @@
 #include "app/implementations/screwskinematicssolver.h"
 
+#include <iostream>
 #include <utility/math.h>
 
 using namespace AIS4104;
@@ -29,7 +30,7 @@ uint32_t ScrewsKinematicsSolver::joint_count() const
     return m_screws.size();
 }
 
-//TASK: Implement fk_solve using screws.
+//Completed-TASK: Implement fk_solve using screws.
 // Equation 4.14, page 140, MR pre-print 2019
 Eigen::Matrix4d ScrewsKinematicsSolver::fk_solve(const Eigen::VectorXd &joint_positions)
 {
@@ -52,13 +53,13 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
     return ik_solve(t_sd, j0, [&](const std::vector<Eigen::VectorXd> &) { return 0u; });
 }
 
-//TASK: Implement ik_solve using screws.
-// TODO: Have another look at the IK_solver for multiple solutions.
+//Completed-ish-TASK: Implement ik_solve using screws.
+// During testing this solver struggles with dynamic changes such as working in the task space with sliders. For single calculations it works
 // Numerical IK in body frame (Section 6.2.2, MR preprint 2019) Mainly page 228-229
 Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, const Eigen::VectorXd &j0, const std::function<uint32_t(const std::vector<Eigen::VectorXd> &)> &solution_selector)
 {
-    constexpr size_t max_iter = 100;
-    const double gamma  = 0.5;
+    constexpr size_t max_iter = 1000;
+    const double gamma  = 0.1;
     const double lambda = 1e-4;
     size_t iter = 0;
 
@@ -73,13 +74,15 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
             Eigen::Matrix4d T_ee = fk_solve(angle_guess);
             Eigen::Matrix4d T_err = (T_ee.inverse() * t_sd).eval();
 
-            auto [Vb, _] = utility::matrix_logarithm(T_err);
+            auto [S, theta] = utility::matrix_logarithm(T_err);
 
+            Eigen::VectorXd Vb = S * theta;
             Eigen::Vector3d wb = Vb.head<3>();
             Eigen::Vector3d vb = Vb.tail<3>();
 
             if (wb.norm() < m_we && vb.norm() < m_ve) {
                 candidates.push_back(angle_guess);
+                std::cout << iter << std::endl;
                 break;
             }
 
@@ -91,16 +94,18 @@ Eigen::VectorXd ScrewsKinematicsSolver::ik_solve(const Eigen::Matrix4d &t_sd, co
 
             angle_guess += gamma * (Jb_pinv * Vb);
             }
+        if (candidates.empty()){candidates.push_back(angle_guess);}
         }
 
     // Strictly speaking we always currently only compute one solution. It would be beneficial for a solution selector
     // if multiple solutions were computed. Right now it serves no purpose for the screw solver. And since we will not use it further
     // no further solutions will be computed except one.
+
     uint32_t idx = solution_selector(candidates);
     if (idx >= candidates.size()) {
         throw std::out_of_range("ik_solve: solution_selector returned invalid index");
     }
-
+    std::cout << candidates[idx] << std::endl;
     return candidates[idx];
 }
 
@@ -110,7 +115,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     return {m_m, m_screws};
 }
 
-//TASK: Implement body_chain(). You can obtain the variables to transform to body frame from space_chain().
+//Completed-TASK: Implement body_chain(). You can obtain the variables to transform to body frame from space_chain().
 // Equation 4.16, page 147, MR pre-print 2019
 std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver::body_chain()
 {
@@ -126,7 +131,7 @@ std::pair<Eigen::Matrix4d, std::vector<Eigen::VectorXd>> ScrewsKinematicsSolver:
     return {m, b_screws};
 }
 
-//TASK: Implement space_jacobian() using space_chain()
+//Completed-TASK: Implement space_jacobian() using space_chain()
 // Equation 5.11, page 178, MR pre-print 2019
 Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
@@ -146,7 +151,7 @@ Eigen::MatrixXd ScrewsKinematicsSolver::space_jacobian(const Eigen::VectorXd &cu
     return J;
 }
 
-//TASK: Implement body_jacobian() using body_chain() !! Test if its correct with order of multiplication later
+//Completed-TASK: Implement body_jacobian() using body_chain() !! Test if its correct with order of multiplication later
 // Equation 5.18, page 183, MR pre-print 2019
 Eigen::MatrixXd ScrewsKinematicsSolver::body_jacobian(const Eigen::VectorXd &current_joint_positions)
 {

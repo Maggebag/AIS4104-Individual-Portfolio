@@ -28,20 +28,33 @@ Eigen::VectorXd MotionPlannerImpl::task_space_pose(const Eigen::Matrix4d &pose)
 //TASK: Implement a function that calculates the pose of the given screw, and solves the IK to obtain the joint positions
 Eigen::VectorXd MotionPlannerImpl::task_space_screw(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &w, const Eigen::Vector3d &q, double theta, double h)
 {
+    Eigen::VectorXd screw = utility::screw_axis(q, w, h);
+
+    Eigen::Matrix4d T_screw = utility::matrix_exponential(screw,theta);
+
+    Eigen::Matrix4d T_pose = T_screw * tw_start_pose;
+
+    // Solve IK
+    Eigen::VectorXd start_angles = m_robot.joint_positions();
+    Eigen::VectorXd end_angles = m_robot.ik_solve_pose(T_pose, start_angles);
     std::cout << "MotionPlannerImpl::task_space_screw:" << std::endl << w.transpose() << std::endl << q.transpose() << std::endl << theta << std::endl << h << std::endl << std::endl;
-    return m_robot.joint_positions();
+    return end_angles;
 }
 
-//TASK: Implement jogging in tool frame from the start pose along the displacement and rotation
+//Completed-TASK: Implement jogging in tool frame from the start pose along the displacement and rotation
 Eigen::VectorXd MotionPlannerImpl::tool_frame_displace(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &tf_offset, const Eigen::Vector3d &tf_zyx)
 {
+    // New pose in world frame
     Eigen::Matrix4d pose = tw_start_pose * utility::transformation_matrix(utility::rotation_matrix_from_euler_zyx(tf_zyx), tf_offset);
-    return m_robot.joint_positions();
+    Eigen::VectorXd start_angles = m_robot.joint_positions();
+
+    return m_robot.ik_solve_pose(pose, start_angles);
 }
 
 //TASK: Implement a P2P trajectory generator from the current configuration to the target.
 std::shared_ptr<Simulation::TrajectoryGenerator> MotionPlannerImpl::task_space_ptp_trajectory(const Eigen::Vector3d &pos, const Eigen::Vector3d &euler_zyx)
 {
+
     std::cout << "MotionPlannerImpl::task_space_ptp_trajectory:" << std::endl << pos.transpose() << std::endl << euler_zyx.transpose() << std::endl << std::endl;
     return nullptr;
 }
