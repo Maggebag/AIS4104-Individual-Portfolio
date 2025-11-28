@@ -13,6 +13,7 @@ bool MyPTPTrajectoryGenerator::has_reached_endpoint() const
     return m_current == m_total || m_stopped;
 }
 
+// Section 9.2.2.1, page 331-332, MR pre-print 2019
 bool MyPTPTrajectoryGenerator::plan_trajectory(const Simulation::JointLimits &limits, double velocity_factor)
 {
     if(m_w0.isApprox(m_w1))
@@ -34,6 +35,7 @@ bool MyPTPTrajectoryGenerator::plan_trajectory(const Simulation::JointLimits &li
     return true;
 }
 
+// Section 9.2.2.1, page 331-332, MR pre-print 2019
 Eigen::VectorXd MyPTPTrajectoryGenerator::joint_positions(std::chrono::nanoseconds delta_t)
 {
     double t = static_cast<double>(m_current.count());

@@ -26,7 +26,7 @@ Eigen::VectorXd MotionPlannerImpl::task_space_pose(const Eigen::Matrix4d &pose)
     return m_robot.ik_solve_pose(pose, m_robot.joint_positions());
 }
 
-//TASK: Implement a function that calculates the pose of the given screw, and solves the IK to obtain the joint positions
+//Completed-TASK: Implement a function that calculates the pose of the given screw, and solves the IK to obtain the joint positions
 Eigen::VectorXd MotionPlannerImpl::task_space_screw(const Eigen::Matrix4d &tw_start_pose, const Eigen::Vector3d &w, const Eigen::Vector3d &q, double theta, double h)
 {
     Eigen::VectorXd screw = utility::screw_axis(q, w, h);
